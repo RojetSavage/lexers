@@ -1,8 +1,8 @@
 import { Lexer, TokenType } from './lexer';
-import { acceptInput } from './repl'
+import { runRepl } from './repl'
 
 function main() {
-  acceptInput();
+  runRepl();
 }
 
 main();

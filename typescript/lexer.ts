@@ -1,5 +1,3 @@
-//type TokenType = string;
-
 interface Token {
   type : TokenType; 
   literal : string;
@@ -33,6 +31,7 @@ Lparen = "(",
 Rparen = ")",
 Lsquirly = "{",
 Rsquirly = "}",
+Dash = "-",
 
 // kEywords
 Function = "FUNCTION",
@@ -44,12 +43,12 @@ Else = "ELSE",
 Return = "RETURN"
 }
 
-function isLetter(character: string) {
+function isLetter(character: string) : boolean {
   const char = character.charCodeAt(0);
   return ("a".charCodeAt(0) <= char && "z".charCodeAt(0) >= char) || ("A".charCodeAt(0) <= char && "Z".charCodeAt(0) >= char) || (char === "_".charCodeAt(0));
 }
 
-function isNumber(character: string) {
+function isNumber(character: string) : boolean {
   const char = character.charCodeAt(0);
   return "0".charCodeAt(0) <= char && "9".charCodeAt(0) >= char;  
 }
@@ -118,7 +117,7 @@ export class Lexer {
   }
 
   skipWhitespace() {
-    if (this.currentChar === " " || this.currentChar === "\t" || this.currentChar === "\n" || this.currentChar === "\r") {
+    while (this.currentChar == " " || this.currentChar == "\t" || this.currentChar == "\n" || this.currentChar == "\r") {
       this.readChar();
     }
   }
@@ -130,8 +129,8 @@ export class Lexer {
     }
   }
 
-  nextToken(): Token  {
-    let newToken: Token | undefined = undefined;
+  nextToken(): Token | undefined  {
+    let newToken: Token | undefined;
 
     this.skipWhitespace();
   
@@ -157,8 +156,6 @@ export class Lexer {
       newToken = this.newToken(TokenType.Lsquirly, this.currentChar)
     } else if (this.currentChar == "}") {
       newToken = this.newToken(TokenType.Rsquirly, this.currentChar)
-    } else if (this.currentChar == "") {
-      newToken = this.newToken(TokenType.Eof, "")
     } else if (this.currentChar == "-") {
       newToken = this.newToken(TokenType.Minus, this.currentChar)
     } else if (this.currentChar == "!") {
@@ -174,11 +171,12 @@ export class Lexer {
     } else if (this.currentChar == "/") {
       newToken = this.newToken(TokenType.Slash, this.currentChar)
     } else if (this.currentChar == "<") {
-      newToken = this.newToken(TokenType.LessThan, "")
+      newToken = this.newToken(TokenType.LessThan, "<")
     } else if (this.currentChar == ">") {
-      newToken = this.newToken(TokenType.GreaterThan, "")
-    } 
-
+      newToken = this.newToken(TokenType.GreaterThan, ">")
+    } else if (this.currentChar == "") {
+      newToken = this.newToken(TokenType.Eof, "eof")
+    }
 
     if (isLetter(this.currentChar)) {
       let literal = this.readIdentifier();
@@ -188,9 +186,9 @@ export class Lexer {
       let literal = this.readNumber();
       newToken = this.newToken(TokenType.Int, literal);
       return newToken;
-    } else if (newToken === undefined) {
-      newToken = this.newToken(TokenType.Illegal, this.currentChar);
-    }
+    } else if (newToken === undefined) { 
+      newToken = this.newToken(TokenType.Illegal, "Illegal");
+    } 
 
     this.readChar();
 
